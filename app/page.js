@@ -1,101 +1,159 @@
-import Image from "next/image";
+"use client";
+import { useState, useEffect } from "react";
+import S3 from "react-aws-s3-typescript";
+import { createClient } from "@supabase/supabase-js";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const getSupabase = () => {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
+    return createClient(supabaseUrl, supabaseKey);
+  };
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const [uploadedImageUrl, setUploadedImageUrl] = useState("");
+
+  const [form, setForm] = useState({
+    price: "",
+    width: "",
+    height: "",
+    desc: "",
+  });
+
+  const handleImage = (e) => {
+    const file = e.target.files[0];
+    handleUpload(file); // Pass the file directly to handleUpload
+  };
+
+  const handleUpload = async (file) => {
+    if (!file) {
+      console.error("No file selected for upload");
+      return;
+    }
+    try {
+      const response = await ReactS3Client.uploadFile(file);
+      console.log("Uploaded Image Data:", response);
+      setUploadedImageUrl(response.location); // Save the uploaded image URL
+    } catch (err) {
+      console.error("Error uploading file:", err);
+    }
+  };
+
+  const ReactS3Client = new S3({
+    accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
+    bucketName: process.env.NEXT_PUBLIC_AWS_BUCKET,
+    dirName: "uploads/newdir",
+    region: "ap-southeast-1",
+    S3Url: "https://christmasp.s3.ap-southeast-1.amazonaws.com",
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!uploadedImageUrl) {
+      console.error("Please upload an image before submitting");
+      return;
+    }
+
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from("fushing")
+      .insert([{ ...form, image: uploadedImageUrl }]);
+
+    if (error) {
+      console.error("Error inserting data:", error);
+    } else {
+      console.log("Data inserted successfully:", data);
+      setForm({ price: "", width: "", height: "", desc: "" }); // Reset form
+    }
+  };
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  return (
+    <div className="bg-gray-100 min-h-screen py-10 px-5">
+      <h1 className="text-3xl font-bold text-center text-blue-600 mb-8">
+        Image Upload and Supabase Form
+      </h1>
+
+      {/* Form Section */}
+      <form
+        className="bg-white shadow-lg rounded-lg p-6 max-w-lg mx-auto mb-10"
+        onSubmit={handleSubmit}
+      >
+        <h2 className="text-2xl font-semibold mb-4 text-gray-700">
+          Add New Item
+        </h2>
+        <div className="mb-4">
+          <label className="block text-gray-600 font-medium mb-2">
+            Price (Integer)
+          </label>
+          <input
+            type="number"
+            name="price"
+            value={form.price}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded-lg p-2"
+            placeholder="Enter price"
+          />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+        <div className="mb-4">
+          <label className="block text-gray-600 font-medium mb-2">
+            Width (Integer)
+          </label>
+          <input
+            type="number"
+            name="width"
+            value={form.width}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded-lg p-2"
+            placeholder="Enter width"
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
+        </div>
+        <div className="mb-4">
+          <label className="block text-gray-600 font-medium mb-2">
+            Height (Integer)
+          </label>
+          <input
+            type="number"
+            name="height"
+            value={form.height}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded-lg p-2"
+            placeholder="Enter height"
           />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
+        </div>
+        <div className="mb-4">
+          <label className="block text-gray-600 font-medium mb-2">
+            Description
+          </label>
+          <textarea
+            name="desc"
+            value={form.desc}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded-lg p-2"
+            placeholder="Enter description"
           />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        </div>
+        <div className="mb-4">
+          <label className="block text-gray-600 font-medium mb-2">Image</label>
+          <input
+            type="file"
+            onChange={handleImage}
+            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          />
+          {uploadedImageUrl && (
+            <p className="text-green-600 mt-2">Image uploaded successfully!</p>
+          )}
+        </div>
+        <button
+          type="submit"
+          className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+        >
+          Submit
+        </button>
+      </form>
     </div>
   );
 }
