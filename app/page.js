@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import S3 from "react-aws-s3-typescript";
 import { createClient } from "@supabase/supabase-js";
 
@@ -10,7 +10,8 @@ export default function Home() {
     return createClient(supabaseUrl, supabaseKey);
   };
 
-  const [uploadedImageUrl, setUploadedImageUrl] = useState("");
+  const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
+  const [imageInputs, setImageInputs] = useState([0]); // 用來動態新增file input的狀態
 
   const [form, setForm] = useState({
     price: "",
@@ -19,12 +20,12 @@ export default function Home() {
     desc: "",
   });
 
-  const handleImage = (e) => {
+  const handleImage = (e, index) => {
     const file = e.target.files[0];
-    handleUpload(file); // Pass the file directly to handleUpload
+    handleUpload(file, index); // 傳遞 file 和 index
   };
 
-  const handleUpload = async (file) => {
+  const handleUpload = async (file, index) => {
     if (!file) {
       console.error("No file selected for upload");
       return;
@@ -32,7 +33,12 @@ export default function Home() {
     try {
       const response = await ReactS3Client.uploadFile(file);
       console.log("Uploaded Image Data:", response);
-      setUploadedImageUrl(response.location); // Save the uploaded image URL
+
+      setUploadedImageUrls((prevUrls) => {
+        const updatedUrls = [...prevUrls];
+        updatedUrls[index] = response.location; // 更新對應 index 的 URL
+        return updatedUrls;
+      });
     } catch (err) {
       console.error("Error uploading file:", err);
     }
@@ -49,26 +55,32 @@ export default function Home() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!uploadedImageUrl) {
-      console.error("Please upload an image before submitting");
+    if (!uploadedImageUrls.length) {
+      console.error("Please upload at least one image before submitting");
       return;
     }
 
     const supabase = getSupabase();
     const { data, error } = await supabase
       .from("fushing")
-      .insert([{ ...form, image: uploadedImageUrl }]);
+      .insert([{ ...form, image: uploadedImageUrls }]);
 
     if (error) {
       console.error("Error inserting data:", error);
     } else {
       console.log("Data inserted successfully:", data);
       setForm({ price: "", width: "", height: "", desc: "" }); // Reset form
+      setUploadedImageUrls([]); // Reset images
+      setImageInputs([0]); // Reset input rows
     }
   };
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const addImageInput = () => {
+    setImageInputs((prev) => [...prev, prev.length]); // 新增一個 input 的 index
   };
 
   return (
@@ -85,6 +97,7 @@ export default function Home() {
         <h2 className="text-2xl font-semibold mb-4 text-gray-700">
           Add New Item
         </h2>
+        {/* Other form fields */}
         <div className="mb-4">
           <label className="block text-gray-600 font-medium mb-2">
             Price (Integer)
@@ -136,20 +149,30 @@ export default function Home() {
             placeholder="Enter description"
           />
         </div>
-        <div className="mb-4">
-          <label className="block text-gray-600 font-medium mb-2">Image</label>
-          <input
-            type="file"
-            onChange={handleImage}
-            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-          />
-          {uploadedImageUrl && (
-            <p className="text-green-600 mt-2">Image uploaded successfully!</p>
-          )}
-        </div>
+        {/* Image upload inputs */}
+        {imageInputs.map((input, index) => (
+          <div key={index} className="mb-4 flex items-center">
+            <input
+              type="file"
+              onChange={(e) => handleImage(e, index)}
+              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+            />
+            {uploadedImageUrls[index] && (
+              <p className="text-green-600 ml-2">Uploaded!</p>
+            )}
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={addImageInput}
+          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+        >
+          Add More Images
+        </button>
+        {/* Submit button */}
         <button
           type="submit"
-          className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+          className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 mt-4"
         >
           Submit
         </button>
