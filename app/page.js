@@ -15,9 +15,9 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
-    price: 0,
-    width: 0,
-    height: 0,
+    price: "",
+    width: "",
+    height: "",
     desc: "",
   });
 
@@ -60,18 +60,25 @@ export default function Home() {
         console.error("Please upload at least one image before submitting");
         return;
       } */
+     // 將需要的字段轉換為整數
+  const formattedForm = {
+    ...form,
+    price: parseInt(form.price, 10) || 0, // 如果為空，默認為 0
+    width: parseInt(form.width, 10) || 0,
+    height: parseInt(form.height, 10) || 0,
+  };
 
     const supabase = getSupabase();
     setLoading(true);
     const { data, error } = await supabase
       .from("fushing")
-      .insert([{ ...form, image: uploadedImageUrls }]);
+      .insert([{ ...formattedForm, image: uploadedImageUrls }]);
 
     if (error) {
       console.error("Error inserting data:", error);
     } else {
       console.log("Data inserted successfully:", data);
-      setForm({ price: 0, width: 0, height: 0, desc: "" }); // Reset form
+      setForm({ price: "", width: "", height: "", desc: "" }); // Reset form
       setUploadedImageUrls([]); // Reset images
       setImageInputs([0]); // Reset input rows
     }
@@ -111,7 +118,7 @@ export default function Home() {
             value={form.price}
             onChange={handleChange}
             className="w-full border border-gray-300 rounded-lg p-2"
-            placeholder="Enter price"
+            placeholder="輸入價錢"
           />
         </div>
         <div className="mb-4">
@@ -124,7 +131,7 @@ export default function Home() {
             value={form.width}
             onChange={handleChange}
             className="w-full border border-gray-300 rounded-lg p-2"
-            placeholder="Enter width"
+            placeholder="輸入寬度"
           />
         </div>
         <div className="mb-4">
@@ -137,7 +144,7 @@ export default function Home() {
             value={form.height}
             onChange={handleChange}
             className="w-full border border-gray-300 rounded-lg p-2"
-            placeholder="Enter height"
+            placeholder="輸入高度"
           />
         </div>
         <div className="mb-4">
