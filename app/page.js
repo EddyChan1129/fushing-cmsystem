@@ -89,7 +89,7 @@ export default function Home() {
   return (
     <div className="bg-gray-100 min-h-screen py-10 px-5">
       <h1 className="text-3xl font-bold text-center text-blue-600 mb-8">
-        Image Upload and Supabase Form
+        上傳產品
       </h1>
 
       {/* Form Section */}
@@ -98,12 +98,12 @@ export default function Home() {
         onSubmit={handleSubmit}
       >
         <h2 className="text-2xl font-semibold mb-4 text-gray-700">
-          Add New Item
+          新增產品
         </h2>
         {/* Other form fields */}
         <div className="mb-4">
           <label className="block text-gray-600 font-medium mb-2">
-            Price (Integer)
+            價錢
           </label>
           <input
             type="number"
@@ -116,7 +116,7 @@ export default function Home() {
         </div>
         <div className="mb-4">
           <label className="block text-gray-600 font-medium mb-2">
-            Width (Integer)
+            寬度 
           </label>
           <input
             type="number"
@@ -129,7 +129,7 @@ export default function Home() {
         </div>
         <div className="mb-4">
           <label className="block text-gray-600 font-medium mb-2">
-            Height (Integer)
+            高度
           </label>
           <input
             type="number"
@@ -142,26 +142,26 @@ export default function Home() {
         </div>
         <div className="mb-4">
           <label className="block text-gray-600 font-medium mb-2">
-            Description
+            產品描述
           </label>
           <textarea
             name="desc"
             value={form.desc}
             onChange={handleChange}
             className="w-full border border-gray-300 rounded-lg p-2"
-            placeholder="Enter description"
+            placeholder="輸入產品描述"
           />
         </div>
         {/* Image upload inputs */}
         {imageInputs.map((input, index) => (
-          <div key={index} className="mb-4 flex items-center">
+          <div key={index} className="mb-4 flex items-center  justify-between">
             <input
               type="file"
               onChange={(e) => handleImage(e, index)}
-              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              className="block w-fit text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 "
             />
             {uploadedImageUrls[index] && (
-              <p className="text-green-600 ml-2">Uploaded!</p>
+              <p className="text-green-600 ">已上傳圖片</p>
             )}
           </div>
         ))}
@@ -179,24 +179,24 @@ export default function Home() {
           </div>
         )}
         <div className="flex flex-col gap-5">
-          {uploadedImageUrls.length > 0 && (
-
-            <button
-              type="button"
-              onClick={addImageInput}
-              className={`bg-blue-500 text-white px-4 mt-4 py-2 rounded-md w-fit ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'
-                }`}
-            >
-              Add More Images
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={addImageInput}
+            className={`bg-blue-500 text-white px-4 mt-4 py-2 rounded-md w-fit ${
+              loading || uploadedImageUrls.length == 0 ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-600"
+            }
+            `}
+          >
+            新增更多圖片
+          </button>
           {/* Submit button */}
           <button
             type="submit"
-            className={`bg-green-500 text-white px-4 py-2 rounded-md ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-600'
-              }`}
+            className={`bg-green-500 text-white px-4 py-2 rounded-md ${
+              loading ? "opacity-50 cursor-not-allowed" : "hover:bg-green-600"
+            }`}
           >
-            Submit
+            {loading ? "上傳中..." : "上傳產品"}
           </button>
         </div>
       </form>
