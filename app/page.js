@@ -12,11 +12,12 @@ export default function Home() {
 
   const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
   const [imageInputs, setImageInputs] = useState([0]); // 用來動態新增file input的狀態
+  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
-    price: "",
-    width: "",
-    height: "",
+    price: 0,
+    width: 0,
+    height: 0,
     desc: "",
   });
 
@@ -31,9 +32,10 @@ export default function Home() {
       return;
     }
     try {
+      setLoading(true);
       const response = await ReactS3Client.uploadFile(file);
       console.log("Uploaded Image Data:", response);
-
+      setLoading(false);
       setUploadedImageUrls((prevUrls) => {
         const updatedUrls = [...prevUrls];
         updatedUrls[index] = response.location; // 更新對應 index 的 URL
@@ -48,19 +50,19 @@ export default function Home() {
     accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
     bucketName: process.env.NEXT_PUBLIC_AWS_BUCKET,
-    dirName: "uploads/newdir",
     region: "ap-southeast-1",
     S3Url: "https://christmasp.s3.ap-southeast-1.amazonaws.com",
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!uploadedImageUrls.length) {
-      console.error("Please upload at least one image before submitting");
-      return;
-    }
+    /*   if (!uploadedImageUrls.length) {
+        console.error("Please upload at least one image before submitting");
+        return;
+      } */
 
     const supabase = getSupabase();
+    setLoading(true);
     const { data, error } = await supabase
       .from("fushing")
       .insert([{ ...form, image: uploadedImageUrls }]);
@@ -69,10 +71,11 @@ export default function Home() {
       console.error("Error inserting data:", error);
     } else {
       console.log("Data inserted successfully:", data);
-      setForm({ price: "", width: "", height: "", desc: "" }); // Reset form
+      setForm({ price: 0, width: 0, height: 0, desc: "" }); // Reset form
       setUploadedImageUrls([]); // Reset images
       setImageInputs([0]); // Reset input rows
     }
+    setLoading(false);
   };
 
   const handleChange = (e) => {
@@ -162,20 +165,40 @@ export default function Home() {
             )}
           </div>
         ))}
-        <button
-          type="button"
-          onClick={addImageInput}
-          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-        >
-          Add More Images
-        </button>
-        {/* Submit button */}
-        <button
-          type="submit"
-          className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 mt-4"
-        >
-          Submit
-        </button>
+        {/* show uploaded images */}
+        {uploadedImageUrls.length > 0 && (
+          <div className="flex flex-wrap">
+            {uploadedImageUrls.map((url, index) => (
+              <img
+                key={index}
+                src={url}
+                alt="uploaded image"
+                className="w-20 h-20 object-cover rounded-md mr-2"
+              />
+            ))}
+          </div>
+        )}
+        <div className="flex flex-col gap-5">
+          {uploadedImageUrls.length > 0 && (
+
+            <button
+              type="button"
+              onClick={addImageInput}
+              className={`bg-blue-500 text-white px-4 mt-4 py-2 rounded-md w-fit ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'
+                }`}
+            >
+              Add More Images
+            </button>
+          )}
+          {/* Submit button */}
+          <button
+            type="submit"
+            className={`bg-green-500 text-white px-4 py-2 rounded-md ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-600'
+              }`}
+          >
+            Submit
+          </button>
+        </div>
       </form>
     </div>
   );
