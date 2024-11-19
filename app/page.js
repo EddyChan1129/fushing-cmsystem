@@ -60,13 +60,13 @@ export default function Home() {
         console.error("Please upload at least one image before submitting");
         return;
       } */
-     // 將需要的字段轉換為整數
-  const formattedForm = {
-    ...form,
-    price: parseInt(form.price, 10) || 0, // 如果為空，默認為 0
-    width: parseInt(form.width, 10) || 0,
-    height: parseInt(form.height, 10) || 0,
-  };
+    // 將需要的字段轉換為整數
+    const formattedForm = {
+      ...form,
+      price: parseInt(form.price, 10) || 0, // 如果為空，默認為 0
+      width: parseInt(form.width, 10) || 0,
+      height: parseInt(form.height, 10) || 0,
+    };
 
     const supabase = getSupabase();
     setLoading(true);
@@ -104,46 +104,38 @@ export default function Home() {
         className="bg-white shadow-lg rounded-lg p-6 max-w-lg mx-auto mb-10"
         onSubmit={handleSubmit}
       >
-        <h2 className="text-2xl font-semibold mb-4 text-gray-700">
-          新增產品
-        </h2>
+        <h2 className="text-2xl font-semibold mb-4 text-gray-700">新增產品</h2>
         {/* Other form fields */}
         <div className="mb-4">
-          <label className="block text-gray-600 font-medium mb-2">
-            價錢
-          </label>
+          <label className="block text-gray-600 font-medium mb-2">價錢</label>
           <input
             type="number"
             name="price"
             value={form.price}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg p-2"
+            className="w-full border border-gray-300 rounded-lg p-2 text-black"
             placeholder="輸入價錢"
           />
         </div>
         <div className="mb-4">
-          <label className="block text-gray-600 font-medium mb-2">
-            寬度 
-          </label>
+          <label className="block text-gray-600 font-medium mb-2">寬度</label>
           <input
             type="number"
             name="width"
             value={form.width}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg p-2"
+            className="w-full border border-gray-300 rounded-lg p-2 text-black"
             placeholder="輸入寬度"
           />
         </div>
         <div className="mb-4">
-          <label className="block text-gray-600 font-medium mb-2">
-            高度
-          </label>
+          <label className="block text-gray-600 font-medium mb-2">高度</label>
           <input
             type="number"
             name="height"
             value={form.height}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg p-2"
+            className="w-full border border-gray-300 rounded-lg p-2 text-black"
             placeholder="輸入高度"
           />
         </div>
@@ -155,7 +147,7 @@ export default function Home() {
             name="desc"
             value={form.desc}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg p-2"
+            className="w-full border border-gray-300 rounded-lg p-2 text-black"
             placeholder="輸入產品描述"
           />
         </div>
@@ -189,21 +181,33 @@ export default function Home() {
           <button
             type="button"
             onClick={addImageInput}
+            disabled={uploadedImageUrls.length !== imageInputs.length} // 按鈕狀態取決於上傳進度
             className={`bg-blue-500 text-white px-4 mt-4 py-2 rounded-md w-fit ${
-              loading || uploadedImageUrls.length == 0 ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-600"
-            }
-            `}
+              uploadedImageUrls.length !== imageInputs.length
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-blue-600"
+            }`}
           >
             新增更多圖片
           </button>
+
           {/* Submit button */}
           <button
             type="submit"
+            disabled={
+              loading || uploadedImageUrls.length !== imageInputs.length
+            } // 判斷條件
             className={`bg-green-500 text-white px-4 py-2 rounded-md ${
-              loading ? "opacity-50 cursor-not-allowed" : "hover:bg-green-600"
+              loading || uploadedImageUrls.length !== imageInputs.length
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-green-600"
             }`}
           >
-            {loading ? "上傳中..." : "上傳產品"}
+            {loading
+              ? "上傳中..."
+              : uploadedImageUrls.length !== imageInputs.length
+                ? "請先上傳所有圖片"
+                : "上傳產品"}
           </button>
         </div>
       </form>
