@@ -105,7 +105,7 @@ export default function Home() {
   return (
     <div className="bg-gray-100 min-h-screen py-10 px-5">
       <h1 className="text-3xl font-bold text-center text-blue-600 mb-8">
-        上傳產品
+        上傳聖誕產品
       </h1>
 
       {/* Form Section */}
@@ -186,9 +186,11 @@ export default function Home() {
             <option value="其他" checked>
               其他
             </option>
-            <option value="新年">新年</option>
-            <option value="聖誕節">聖誕節</option>
-            <option value="萬聖節">萬聖節 </option>
+            <option value="聖誕樹">聖誕樹</option>
+            <option value="掛件">掛件</option>
+            <option value="窗貼">窗貼 </option>
+            <option value="燈飾">燈飾 </option>
+            <option value="大型擺設">大型擺設 </option>
           </select>
 
           {/* Show selected product types */}
