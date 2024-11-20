@@ -15,10 +15,12 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
+    name: "",
     price: "",
     width: "",
     height: "",
     desc: "",
+    product_type: [],
   });
 
   const handleImage = (e, index) => {
@@ -78,7 +80,14 @@ export default function Home() {
       console.error("Error inserting data:", error);
     } else {
       console.log("Data inserted successfully:", data);
-      setForm({ price: "", width: "", height: "", desc: "" }); // Reset form
+      setForm({
+        name: "",
+        price: "",
+        width: "",
+        height: "",
+        product_type: [],
+        desc: "",
+      }); // Reset form
       setUploadedImageUrls([]); // Reset images
       setImageInputs([0]); // Reset input rows
     }
@@ -106,6 +115,19 @@ export default function Home() {
       >
         <h2 className="text-2xl font-semibold mb-4 text-gray-700">新增產品</h2>
         {/* Other form fields */}
+        <div className="mb-4">
+          <label className="block text-gray-600 font-medium mb-2">
+            產品名稱
+          </label>
+          <input
+            type="text"
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded-lg p-2 text-black"
+            placeholder="輸入產品名稱"
+          />
+        </div>
         <div className="mb-4">
           <label className="block text-gray-600 font-medium mb-2">價錢</label>
           <input
@@ -139,6 +161,46 @@ export default function Home() {
             placeholder="輸入高度"
           />
         </div>
+
+        <div className="mb-4">
+          <label className="block text-gray-600 font-medium mb-2">種類</label>
+          <select
+            name="product_type"
+            onChange={(e) => {
+              const value = e.target.value;
+              setForm((prevForm) => {
+                const { product_type } = prevForm;
+                // Append the value if it's not already in the array
+                if (!product_type.includes(value)) {
+                  return {
+                    ...prevForm,
+                    product_type: [...product_type, value],
+                  };
+                }
+                return prevForm; // No changes if value already exists
+              });
+            }}
+            className="w-full border border-gray-300 rounded-lg p-2 text-black"
+          >
+            <option disabled>請選擇種類</option>
+            <option value="其他" checked>
+              其他
+            </option>
+            <option value="新年">新年</option>
+            <option value="聖誕節">聖誕節</option>
+            <option value="萬聖節">萬聖節 </option>
+          </select>
+
+          {/* Show selected product types */}
+          <div className="mt-2">
+            {form.product_type.length > 0 && (
+              <p className="text-gray-700">
+                已選種類: {form.product_type.join(", ")}
+              </p>
+            )}
+          </div>
+        </div>
+
         <div className="mb-4">
           <label className="block text-gray-600 font-medium mb-2">
             產品描述
