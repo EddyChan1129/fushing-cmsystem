@@ -65,9 +65,10 @@ export default function Home() {
     // 將需要的字段轉換為整數
     const formattedForm = {
       ...form,
-      price: parseInt(form.price, 10) || 0, // 如果為空，默認為 0
-      width: parseInt(form.width, 10) || 0,
-      height: parseInt(form.height, 10) || 0,
+      price: parseInt(form.price, 10) || null, // 如果為空，默認為 null
+      width: parseInt(form.width, 10) || null,
+      height: parseInt(form.height, 10) || null,
+      product_type: form.product_type.length === 0 ? ["-"] : form.product_type, // 如果為空，設為 ["-"]
     };
 
     const supabase = getSupabase();
@@ -90,8 +91,8 @@ export default function Home() {
       }); // Reset form
       setUploadedImageUrls([]); // Reset images
       setImageInputs([0]); // Reset input rows
+      window.location.reload();
     }
-    setLoading(false);
   };
 
   const handleChange = (e) => {
@@ -100,6 +101,14 @@ export default function Home() {
 
   const addImageInput = () => {
     setImageInputs((prev) => [...prev, prev.length]); // 新增一個 input 的 index
+  };
+
+  const handleRemoveType = (index) => {
+    setForm((prevForm) => {
+      const updatedProductTypes = [...prevForm.product_type];
+      updatedProductTypes.splice(index, 1); // Remove the item at the given index
+      return { ...prevForm, product_type: updatedProductTypes };
+    });
   };
 
   return (
@@ -169,7 +178,13 @@ export default function Home() {
             onChange={(e) => {
               const value = e.target.value;
               setForm((prevForm) => {
-                const { product_type } = prevForm;
+                let { product_type } = prevForm;
+
+                // 如果 product_type 包含 '-'，則移除它
+                if (product_type.includes("-")) {
+                  product_type = product_type.filter((type) => type !== "-");
+                }
+
                 // Append the value if it's not already in the array
                 if (!product_type.includes(value)) {
                   return {
@@ -196,9 +211,26 @@ export default function Home() {
           {/* Show selected product types */}
           <div className="mt-2">
             {form.product_type.length > 0 && (
-              <p className="text-gray-700 py-3">
-                <b>已選種類:</b><br/> {form.product_type.join(", ")}
-              </p>
+              <div className="text-gray-700 py-3 relative">
+                <b>已選種類:</b>
+                <br />
+                <div>
+                  {form.product_type.map((type, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between"
+                    >
+                      {type}{" "}
+                      <i
+                        className="bg-red-500 text-white pl-1 pr-2 py-0 text-sm rounded-lg shadow-md"
+                        onClick={() => handleRemoveType(index)}
+                      >
+                        ✖
+                      </i>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
         </div>
