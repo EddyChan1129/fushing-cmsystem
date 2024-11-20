@@ -196,8 +196,8 @@ export default function Home() {
           {/* Show selected product types */}
           <div className="mt-2">
             {form.product_type.length > 0 && (
-              <p className="text-gray-700">
-                已選種類: {form.product_type.join(", ")}
+              <p className="text-gray-700 py-3">
+                <b>已選種類:</b><br/> {form.product_type.join(", ")}
               </p>
             )}
           </div>
