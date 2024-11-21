@@ -68,7 +68,7 @@ export default function Home() {
       price: parseInt(form.price, 10) || null, // 如果為空，默認為 null
       width: parseInt(form.width, 10) || null,
       height: parseInt(form.height, 10) || null,
-      product_type: form.product_type.length === 0 ? ["-"] : form.product_type, // 如果為空，設為 ["-"]
+      product_type: form.product_type.length === 0 ? [" "] : form.product_type, // 如果為空，設為 ["-"]
     };
 
     const supabase = getSupabase();
@@ -114,7 +114,7 @@ export default function Home() {
   return (
     <div className="bg-gray-100 min-h-screen py-10 px-5">
       <h1 className="text-3xl font-bold text-center text-blue-600 mb-8">
-        上傳聖誕產品
+      新增聖誕產品
       </h1>
 
       {/* Form Section */}
@@ -122,8 +122,6 @@ export default function Home() {
         className="bg-white shadow-lg rounded-lg p-6 max-w-lg mx-auto mb-10"
         onSubmit={handleSubmit}
       >
-        <h2 className="text-2xl font-semibold mb-4 text-gray-700">新增產品</h2>
-        {/* Other form fields */}
         <div className="mb-4">
           <label className="block text-gray-600 font-medium mb-2">
             產品名稱
@@ -138,7 +136,7 @@ export default function Home() {
           />
         </div>
         <div className="mb-4">
-          <label className="block text-gray-600 font-medium mb-2">價錢</label>
+          <label className="block text-gray-600 font-medium mb-2">價錢 (HKD)</label>
           <input
             type="number"
             name="price"
@@ -149,7 +147,7 @@ export default function Home() {
           />
         </div>
         <div className="mb-4">
-          <label className="block text-gray-600 font-medium mb-2">寬度</label>
+          <label className="block text-gray-600 font-medium mb-2">寬度 (CM)</label>
           <input
             type="number"
             name="width"
@@ -160,7 +158,7 @@ export default function Home() {
           />
         </div>
         <div className="mb-4">
-          <label className="block text-gray-600 font-medium mb-2">高度</label>
+          <label className="block text-gray-600 font-medium mb-2">高度 (CM)</label>
           <input
             type="number"
             name="height"
@@ -172,41 +170,46 @@ export default function Home() {
         </div>
 
         <div className="mb-4">
-          <label className="block text-gray-600 font-medium mb-2">種類</label>
-          <select
-            name="product_type"
-            onChange={(e) => {
-              const value = e.target.value;
-              setForm((prevForm) => {
-                let { product_type } = prevForm;
-
-                // 如果 product_type 包含 '-'，則移除它
-                if (product_type.includes("-")) {
-                  product_type = product_type.filter((type) => type !== "-");
-                }
-
-                // Append the value if it's not already in the array
-                if (!product_type.includes(value)) {
-                  return {
-                    ...prevForm,
-                    product_type: [...product_type, value],
-                  };
-                }
-                return prevForm; // No changes if value already exists
-              });
-            }}
-            className="w-full border border-gray-300 rounded-lg p-2 text-black"
-          >
-            <option disabled>請選擇種類</option>
-            <option value="其他" checked>
-              其他
-            </option>
-            <option value="聖誕樹">聖誕樹</option>
-            <option value="掛件">掛件</option>
-            <option value="窗貼">窗貼 </option>
-            <option value="燈飾">燈飾 </option>
-            <option value="大型擺設">大型擺設 </option>
-          </select>
+          <div className="flex gap-1 items-center flex-wrap ">
+            <p className="text-gray-700">請選擇種類：</p>
+            <div className="flex items-center gap-2  w-full flex-wrap">
+              {["其他", "聖誕樹", "掛件", "窗貼", "燈飾", "大型擺設"].map(
+                (type) => (
+                  <label
+                    key={type}
+                    className=" text-gray-500 flex gap-1"
+                  >
+                    <input
+                      type="checkbox"
+                      value={type}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setForm((prevForm) => {
+                          const { product_type } = prevForm;
+                          // 如果勾選，新增到陣列；取消勾選，從陣列移除
+                          if (e.target.checked) {
+                            return {
+                              ...prevForm,
+                              product_type: [...product_type, value],
+                            };
+                          } else {
+                            return {
+                              ...prevForm,
+                              product_type: product_type.filter(
+                                (item) => item !== value,
+                              ),
+                            };
+                          }
+                        });
+                      }}
+                      checked={form.product_type.includes(type)}
+                    />
+                    {type}
+                  </label>
+                ),
+              )}
+            </div>
+          </div>
 
           {/* Show selected product types */}
           <div className="mt-2">
