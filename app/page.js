@@ -2,6 +2,7 @@
 import { useState } from "react";
 import S3 from "react-aws-s3-typescript";
 import { createClient } from "@supabase/supabase-js";
+import { Toaster, toast } from "sonner";
 
 export default function Home() {
   const getSupabase = () => {
@@ -30,7 +31,7 @@ export default function Home() {
 
   const handleUpload = async (file, index) => {
     if (!file) {
-      console.error("No file selected for upload");
+      console.log("No file selected for upload");
       return;
     }
     try {
@@ -55,6 +56,26 @@ export default function Home() {
     region: "ap-southeast-1",
     S3Url: "https://christmasp.s3.ap-southeast-1.amazonaws.com",
   });
+
+  const handleRemoveImage = (index) => {
+    setUploadedImageUrls((prevUrls) => {
+      const updatedUrls = [...prevUrls];
+      updatedUrls.splice(index, 1); // Remove the item at the given index
+      // setImageInputs -= 1 &&
+      return updatedUrls;
+    });
+
+    setImageInputs((prev) => {
+      const updatedInputs = [...prev];
+      updatedInputs.splice(index, 1); // Remove the item at the given index
+      return updatedInputs;
+    });
+
+    const fileUrl = uploadedImageUrls[index];
+    const fileName = fileUrl.split("/").pop();
+
+    ReactS3Client.deleteFile(fileName);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -91,7 +112,19 @@ export default function Home() {
       }); // Reset form
       setUploadedImageUrls([]); // Reset images
       setImageInputs([0]); // Reset input rows
-      window.location.reload();
+      setLoading(false);
+      // input file reset to empty
+      document.querySelector("input[type=file]").value = "";
+
+      toast.success("產品上傳成功", {
+        position: "top-center",
+        duration: 5000,
+        style: {
+          backgroundColor: "#10B981",
+          color: "white",
+          textAlign: "center",
+        },
+      });
     }
   };
 
@@ -113,8 +146,9 @@ export default function Home() {
 
   return (
     <div className="bg-gray-100 min-h-screen py-10 px-5">
+      <Toaster />
       <h1 className="text-3xl font-bold text-center text-blue-600 mb-8">
-      新增聖誕產品
+        新增聖誕產品
       </h1>
 
       {/* Form Section */}
@@ -136,7 +170,9 @@ export default function Home() {
           />
         </div>
         <div className="mb-4">
-          <label className="block text-gray-600 font-medium mb-2">價錢 (HKD)</label>
+          <label className="block text-gray-600 font-medium mb-2">
+            價錢 (HKD)
+          </label>
           <input
             type="number"
             name="price"
@@ -147,7 +183,9 @@ export default function Home() {
           />
         </div>
         <div className="mb-4">
-          <label className="block text-gray-600 font-medium mb-2">寬度 (CM)</label>
+          <label className="block text-gray-600 font-medium mb-2">
+            寬度 (CM)
+          </label>
           <input
             type="number"
             name="width"
@@ -158,7 +196,9 @@ export default function Home() {
           />
         </div>
         <div className="mb-4">
-          <label className="block text-gray-600 font-medium mb-2">高度 (CM)</label>
+          <label className="block text-gray-600 font-medium mb-2">
+            高度 (CM)
+          </label>
           <input
             type="number"
             name="height"
@@ -175,10 +215,7 @@ export default function Home() {
             <div className="flex items-center gap-2  w-full flex-wrap">
               {["其他", "聖誕樹", "掛件", "窗貼", "燈飾", "大型擺設"].map(
                 (type) => (
-                  <label
-                    key={type}
-                    className=" text-gray-500 flex gap-1"
-                  >
+                  <label key={type} className=" text-gray-500 flex gap-1">
                     <input
                       type="checkbox"
                       value={type}
@@ -225,7 +262,7 @@ export default function Home() {
                     >
                       {type}{" "}
                       <i
-                        className="bg-red-500 text-white pl-1 pr-2 py-0 text-sm rounded-lg shadow-md"
+                        className="bg-blue-500 text-white pl-1 pr-2 py-0 text-sm rounded-lg shadow-md"
                         onClick={() => handleRemoveType(index)}
                       >
                         ✖
@@ -252,27 +289,43 @@ export default function Home() {
         </div>
         {/* Image upload inputs */}
         {imageInputs.map((input, index) => (
-          <div key={index} className="mb-4 flex items-center  justify-between">
+          <div
+            key={index}
+            className={`mb-4 flex items-center justify-between ${index === imageInputs.length - 1 ? "" : "hidden"}`}
+          >
             <input
               type="file"
               onChange={(e) => handleImage(e, index)}
-              className="block w-fit text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 "
+              className={`text-xs text-gray-500 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 w-3/4 ${
+                uploadedImageUrls[index] ? "hidden" : ""
+              }`}
             />
             {uploadedImageUrls[index] && (
-              <p className="text-green-600 ">已上傳圖片</p>
+              <p className="text-green-600 text-xs w-1/3 ">已上傳圖片</p>
             )}
           </div>
         ))}
         {/* show uploaded images */}
         {uploadedImageUrls.length > 0 && (
-          <div className="flex flex-wrap">
+          <div className="flex flex-wrap relative">
             {uploadedImageUrls.map((url, index) => (
-              <img
-                key={index}
-                src={url}
-                alt="uploaded image"
-                className="w-20 h-20 object-cover rounded-md mr-2"
-              />
+              <div className="relative" key={index}>
+                <img
+                  key={index}
+                  src={url}
+                  alt="uploaded image"
+                  className="w-20 h-20 object-cover rounded-md mr-2 "
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleRemoveImage(index);
+                  }}
+                  className="absolute top-0 right-2 bg-blue-500 text-white px-1 py-0 text-xs rounded-md"
+                >
+                  ✖
+                </button>
+              </div>
             ))}
           </div>
         )}
@@ -297,14 +350,19 @@ export default function Home() {
               loading || uploadedImageUrls.length !== imageInputs.length
             } // 判斷條件
             className={`bg-green-500 text-white px-4 py-2 rounded-md ${
-              loading || uploadedImageUrls.length !== imageInputs.length
+              loading ||
+              uploadedImageUrls.length !== imageInputs.length ||
+              !uploadedImageUrls.length ||
+              !imageInputs.length
                 ? "opacity-50 cursor-not-allowed"
                 : "hover:bg-green-600"
             }`}
           >
             {loading
               ? "上傳中..."
-              : uploadedImageUrls.length !== imageInputs.length
+              : uploadedImageUrls.length !== imageInputs.length ||
+                  !uploadedImageUrls.length ||
+                  !imageInputs.length
                 ? "請先上傳所有圖片"
                 : "上傳產品"}
           </button>
