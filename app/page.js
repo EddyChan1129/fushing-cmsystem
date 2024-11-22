@@ -363,7 +363,7 @@ export default function Home() {
               : uploadedImageUrls.length !== imageInputs.length ||
                   !uploadedImageUrls.length ||
                   !imageInputs.length
-                ? "請先上傳所有圖片"
+                ? "請先上傳圖片"
                 : "上傳產品"}
           </button>
         </div>
