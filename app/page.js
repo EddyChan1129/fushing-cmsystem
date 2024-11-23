@@ -291,10 +291,11 @@ export default function Home() {
                     >
                       {type}{" "}
                       <i
-                        className="bg-blue-500 text-white pl-1 pr-2 py-0 text-sm rounded-lg shadow-md"
+                        style={{ color: "white" }}
+                        className="bg-blue-500 px-1.5 py-0 text-sm rounded-full shadow-md cursor-pointer"
                         onClick={() => handleRemoveType(index)}
                       >
-                        ✖
+                        x 
                       </i>
                     </div>
                   ))}
@@ -373,13 +374,14 @@ export default function Home() {
                   className="w-20 h-20 object-cover rounded-md mr-2 mt-1"
                 />
                 <button
+                  style={{ color: "white" }}
                   type="button"
                   onClick={() => {
                     handleRemoveImage(index);
                   }}
-                  className="absolute top-[-0.5rem] right-[-0.5rem] bg-blue-500 text-gray-100 px-1 py-0 text-xs rounded-md"
+                  className="absolute top-[-0.5rem] right-0 bg-blue-500 px-1.5 py-0 text-sm rounded-full shadow-md" // 按鈕樣式
                 >
-                  ✖
+                  x
                 </button>
               </div>
             ))}
