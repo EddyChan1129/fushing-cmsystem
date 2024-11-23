@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import S3 from "react-aws-s3-typescript";
 import { createClient } from "@supabase/supabase-js";
 import { Toaster, toast } from "sonner";
+import imageCompression from "browser-image-compression";
+
 
 export default function Home() {
   const getSupabase = () => {
@@ -15,6 +17,7 @@ export default function Home() {
   const [imageInputs, setImageInputs] = useState([0]); // 用來動態新增file input的狀態
   const [loading, setLoading] = useState(false);
   const [isRemoveImage, setIsRemoveImage] = useState(false);
+  const [isPressed, setIsPressed] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -47,10 +50,18 @@ export default function Home() {
       return;
     }
     try {
-      setLoading(true);
-      const response = await ReactS3Client.uploadFile(file);
+      setIsPressed(true);
+      // 壓縮圖片
+      const pressedFile = await imageCompression(file, {
+        // 壓縮參數
+        maxSizeMB: 0.1,
+        useWebWorker: true,
+      });
+
+      setIsPressed(false);
+
+      const response = await ReactS3Client.uploadFile(pressedFile);
       console.log("Uploaded Image Data:", response);
-      setLoading(false);
       setUploadedImageUrls((prevUrls) => {
         const updatedUrls = [...prevUrls];
         updatedUrls[index] = response.location; // 更新對應 index 的 URL
@@ -313,18 +324,32 @@ export default function Home() {
             className={`mb-4 flex items-center justify-between ${index === imageInputs.length - 1 ? "" : "hidden"}`}
           >
             <label
-              htmlFor={`gg${index}`}
-              className={`bg-blue-500 text-white px-4 py-2 rounded-md w-fit  hover:bg-blue-100 cursor-pointer ${
+              htmlFor={isPressed ? undefined : `gg${index}`}
+              className={`bg-blue-500 text-white px-4 py-2 rounded-md w-fit  hover:bg-blue-100 ${
                 uploadedImageUrls[index] ? "hidden" : ""
+              }  ${
+                isPressed
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-green-600"
               }`}
             >
-              上傳圖片
+              {isPressed ? (
+                <>
+                  壓縮圖片中...請不要離開視窗
+                </>
+              ) : (
+                "上傳圖片"
+              )}
             </label>
             <input
               type="file"
               id={`gg${index}`}
               onChange={(e) => handleImage(e, index)}
-              className="hidden" // 隱藏原始 input
+              className={`hidden ${
+                isPressed
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-green-600"
+              }`} // 隱藏原始 input
             />
             {uploadedImageUrls[index] && (
               <button
@@ -335,6 +360,9 @@ export default function Home() {
                   uploadedImageUrls.length !== imageInputs.length
                     ? "opacity-50 cursor-not-allowed"
                     : "hover:bg-blue-600"
+                }
+
+                 
                 }`}
               >
                 新增更多圖片

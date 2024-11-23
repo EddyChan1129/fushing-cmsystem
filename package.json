@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.46.1",
+    "browser-image-compression": "^2.0.2",
     "next": "15.0.3",
     "react": "19.0.0-rc-66855b96-20241106",
     "react-aws-s3-typescript": "^2.0.0",
