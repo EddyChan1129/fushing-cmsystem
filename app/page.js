@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import S3 from "react-aws-s3-typescript";
 import { createClient } from "@supabase/supabase-js";
 import { Toaster, toast } from "sonner";
@@ -14,6 +14,7 @@ export default function Home() {
   const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
   const [imageInputs, setImageInputs] = useState([0]); // 用來動態新增file input的狀態
   const [loading, setLoading] = useState(false);
+  const [isRemoveImage, setIsRemoveImage] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -23,6 +24,17 @@ export default function Home() {
     desc: "",
     product_type: [],
   });
+
+  useEffect(() => {
+    if (imageInputs.length > 0) {
+      // 獲取最新的 input id
+      const newIndex = imageInputs.length - 1;
+      const newInput = document.getElementById(`gg${newIndex}`);
+      if (newInput) {
+        newInput.click(); // 點擊最新添加的 input
+      }
+    }
+  }, [isRemoveImage]); // 當 imageInputs 更新時觸發
 
   const handleImage = (e, index) => {
     const file = e.target.files[0];
@@ -61,13 +73,18 @@ export default function Home() {
     setUploadedImageUrls((prevUrls) => {
       const updatedUrls = [...prevUrls];
       updatedUrls.splice(index, 1); // Remove the item at the given index
-      // setImageInputs -= 1 &&
       return updatedUrls;
     });
 
     setImageInputs((prev) => {
       const updatedInputs = [...prev];
       updatedInputs.splice(index, 1); // Remove the item at the given index
+
+      if (updatedInputs.length === 0) {
+        updatedInputs.push(0); // 當沒有 input 時，新增一個 input
+        document.querySelector("input[type=file]").value = "";
+      }
+
       return updatedInputs;
     });
 
@@ -132,8 +149,10 @@ export default function Home() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const addImageInput = () => {
+  const addImageInput = (index) => {
     setImageInputs((prev) => [...prev, prev.length]); // 新增一個 input 的 index
+    // trigger select file id:file{index}
+    setIsRemoveImage(!isRemoveImage);
   };
 
   const handleRemoveType = (index) => {
@@ -293,35 +312,53 @@ export default function Home() {
             key={index}
             className={`mb-4 flex items-center justify-between ${index === imageInputs.length - 1 ? "" : "hidden"}`}
           >
-            <input
-              type="file"
-              onChange={(e) => handleImage(e, index)}
-              className={`text-xs text-gray-500 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 w-3/4 ${
+            <label
+              htmlFor={`gg${index}`}
+              className={`bg-blue-500 text-white px-4 py-2 rounded-md w-fit  hover:bg-blue-100 cursor-pointer ${
                 uploadedImageUrls[index] ? "hidden" : ""
               }`}
+            >
+              上傳圖片
+            </label>
+            <input
+              type="file"
+              id={`gg${index}`}
+              onChange={(e) => handleImage(e, index)}
+              className="hidden" // 隱藏原始 input
             />
             {uploadedImageUrls[index] && (
-              <p className="text-green-600 text-xs w-1/3 ">已上傳圖片</p>
+              <button
+                type="button"
+                onClick={() => addImageInput(index)}
+                disabled={uploadedImageUrls.length !== imageInputs.length} // 按鈕狀態取決於上傳進度
+                className={`bg-blue-500 text-white px-4 mt-4 py-2 rounded-md w-fit  ${
+                  uploadedImageUrls.length !== imageInputs.length
+                    ? "opacity-50 cursor-not-allowed"
+                    : "hover:bg-blue-600"
+                }`}
+              >
+                新增更多圖片
+              </button>
             )}
           </div>
         ))}
         {/* show uploaded images */}
         {uploadedImageUrls.length > 0 && (
-          <div className="flex flex-wrap relative">
+          <div className="flex flex-wrap relative mb-4">
             {uploadedImageUrls.map((url, index) => (
               <div className="relative" key={index}>
                 <img
                   key={index}
                   src={url}
                   alt="uploaded image"
-                  className="w-20 h-20 object-cover rounded-md mr-2 "
+                  className="w-20 h-20 object-cover rounded-md mr-2 mt-1"
                 />
                 <button
                   type="button"
                   onClick={() => {
                     handleRemoveImage(index);
                   }}
-                  className="absolute top-0 right-2 bg-blue-500 text-white px-1 py-0 text-xs rounded-md"
+                  className="absolute top-[-0.5rem] right-[-0.5rem] bg-blue-500 text-white px-1 py-0 text-xs rounded-md"
                 >
                   ✖
                 </button>
@@ -330,19 +367,6 @@ export default function Home() {
           </div>
         )}
         <div className="flex flex-col gap-5">
-          <button
-            type="button"
-            onClick={addImageInput}
-            disabled={uploadedImageUrls.length !== imageInputs.length} // 按鈕狀態取決於上傳進度
-            className={`bg-blue-500 text-white px-4 mt-4 py-2 rounded-md w-fit ${
-              uploadedImageUrls.length !== imageInputs.length
-                ? "opacity-50 cursor-not-allowed"
-                : "hover:bg-blue-600"
-            }`}
-          >
-            新增更多圖片
-          </button>
-
           {/* Submit button */}
           <button
             type="submit"
