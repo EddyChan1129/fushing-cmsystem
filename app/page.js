@@ -290,13 +290,13 @@ export default function Home() {
                       className="flex items-center justify-between"
                     >
                       {type}{" "}
-                      <i
+                      <span
                         style={{ color: "white" }}
                         className="bg-blue-500 px-1.5 py-0 text-sm rounded-full shadow-md cursor-pointer"
                         onClick={() => handleRemoveType(index)}
                       >
                         x 
-                      </i>
+                      </span>
                     </div>
                   ))}
                 </div>
