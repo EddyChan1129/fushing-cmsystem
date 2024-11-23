@@ -377,7 +377,7 @@ export default function Home() {
                   onClick={() => {
                     handleRemoveImage(index);
                   }}
-                  className="absolute top-[-0.5rem] right-[-0.5rem] bg-blue-500 text-white px-1 py-0 text-xs rounded-md"
+                  className="absolute top-[-0.5rem] right-[-0.5rem] bg-blue-500 text-gray-100 px-1 py-0 text-xs rounded-md"
                 >
                   ✖
                 </button>
@@ -392,7 +392,7 @@ export default function Home() {
             disabled={
               loading || uploadedImageUrls.length !== imageInputs.length
             } // 判斷條件
-            className={`bg-green-500 text-white px-4 py-2 rounded-md ${
+            className={`bg-green-500 text-gray-100 px-4 py-2 rounded-md ${
               loading ||
               uploadedImageUrls.length !== imageInputs.length ||
               !uploadedImageUrls.length ||
