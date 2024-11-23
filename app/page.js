@@ -5,7 +5,6 @@ import { createClient } from "@supabase/supabase-js";
 import { Toaster, toast } from "sonner";
 import imageCompression from "browser-image-compression";
 
-
 export default function Home() {
   const getSupabase = () => {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -333,13 +332,7 @@ export default function Home() {
                   : "hover:bg-green-600"
               }`}
             >
-              {isPressed ? (
-                <>
-                  壓縮圖片中...請不要離開視窗
-                </>
-              ) : (
-                "上傳圖片"
-              )}
+              {isPressed ? <>壓縮圖片中...請不要離開視窗</> : "上傳圖片"}
             </label>
             <input
               type="file"
@@ -361,9 +354,7 @@ export default function Home() {
                     ? "opacity-50 cursor-not-allowed"
                     : "hover:bg-blue-600"
                 }
-
-                 
-                }`}
+                `}
               >
                 新增更多圖片
               </button>
