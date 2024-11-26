@@ -57,7 +57,7 @@ export default function Home() {
         useWebWorker: true,
       });
 
-      setIsPressed(false);
+      
 
       const response = await ReactS3Client.uploadFile(pressedFile);
       console.log("Uploaded Image Data:", response);
@@ -66,6 +66,8 @@ export default function Home() {
         updatedUrls[index] = response.location; // 更新對應 index 的 URL
         return updatedUrls;
       });
+
+      setIsPressed(false);
     } catch (err) {
       console.error("Error uploading file:", err);
     }
