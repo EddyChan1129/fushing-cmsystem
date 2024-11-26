@@ -116,7 +116,7 @@ export default function Home() {
       price: parseInt(form.price, 10) || null, // 如果為空，默認為 null
       width: parseInt(form.width, 10) || null,
       height: parseInt(form.height, 10) || null,
-      product_type: form.product_type.length === 0 ? [" "] : form.product_type, // 如果為空，設為 ["-"]
+      product_type: form.product_type.length === 0 ? [""] : form.product_type, // 如果為空，設為 ["-"]
     };
 
     const supabase = getSupabase();
@@ -289,7 +289,7 @@ export default function Home() {
                       key={index}
                       className="flex items-center justify-between"
                     >
-                      {type}{" "}
+                      {type}{""}
                       <span
                         style={{ color: "white" }}
                         className="bg-blue-500 px-1.5 py-0 text-sm rounded-full shadow-md cursor-pointer"
