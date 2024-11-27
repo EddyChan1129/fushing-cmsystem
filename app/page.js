@@ -24,7 +24,7 @@ export default function Home() {
     width: "",
     height: "",
     desc: "",
-    product_type: [],
+    product_type: "其他",
   });
 
   useEffect(() => {
@@ -118,7 +118,6 @@ export default function Home() {
       price: parseInt(form.price, 10) || null, // 如果為空，默認為 null
       width: parseInt(form.width, 10) || null,
       height: parseInt(form.height, 10) || null,
-      product_type: form.product_type.length === 0 ? [""] : form.product_type, // 如果為空，設為 ["-"]
     };
 
     const supabase = getSupabase();
@@ -136,7 +135,7 @@ export default function Home() {
         price: "",
         width: "",
         height: "",
-        product_type: [],
+        product_type: "其他",
         desc: "",
       }); // Reset form
       setUploadedImageUrls([]); // Reset images
@@ -163,14 +162,6 @@ export default function Home() {
 
   const addImageInput = (index) => {
     setImageInputs((prev) => [...prev, ...new Array(1).fill(prev.length)]); // 新增一個新的 input
-  };
-
-  const handleRemoveType = (index) => {
-    setForm((prevForm) => {
-      const updatedProductTypes = [...prevForm.product_type];
-      updatedProductTypes.splice(index, 1); // Remove the item at the given index
-      return { ...prevForm, product_type: updatedProductTypes };
-    });
   };
 
   return (
@@ -246,63 +237,16 @@ export default function Home() {
                 (type) => (
                   <label key={type} className=" text-gray-500 flex gap-1">
                     <input
-                      type="checkbox"
+                      type="radio"
                       value={type}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        setForm((prevForm) => {
-                          const { product_type } = prevForm;
-                          // 如果勾選，新增到陣列；取消勾選，從陣列移除
-                          if (e.target.checked) {
-                            return {
-                              ...prevForm,
-                              product_type: [...product_type, value],
-                            };
-                          } else {
-                            return {
-                              ...prevForm,
-                              product_type: product_type.filter(
-                                (item) => item !== value,
-                              ),
-                            };
-                          }
-                        });
-                      }}
-                      checked={form.product_type.includes(type)}
+                      name="product_type"
+                      onChange={handleChange}
                     />
                     {type}
                   </label>
                 ),
               )}
             </div>
-          </div>
-
-          {/* Show selected product types */}
-          <div className="mt-2">
-            {form.product_type.length > 0 && (
-              <div className="text-gray-700 py-3 relative">
-                <b>已選種類:</b>
-                <br />
-                <div>
-                  {form.product_type.map((type, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between"
-                    >
-                      {type}
-                      {""}
-                      <span
-                        style={{ color: "white" }}
-                        className="bg-blue-500 px-1.5 py-0 text-sm rounded-full shadow-md cursor-pointer"
-                        onClick={() => handleRemoveType(index)}
-                      >
-                        x
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
