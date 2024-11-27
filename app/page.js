@@ -166,8 +166,6 @@ export default function Home() {
 
   const addImageInput = (index) => {
     setImageInputs((prev) => [...prev, ...new Array(1).fill(prev.length)]); // 新增一個新的 input
-    // trigger select file id:file{index}
-    setIsRemoveImage(!isRemoveImage);
   };
 
   const handleRemoveType = (index) => {
@@ -351,21 +349,6 @@ export default function Home() {
                   : "hover:bg-green-600"
               }`} // 隱藏原始 input
             />
-            {uploadedImageUrls[index] && (
-              <button
-                type="button"
-                onClick={() => addImageInput(index)}
-                disabled={uploadedImageUrls.length !== imageInputs.length} // 按鈕狀態取決於上傳進度
-                className={`bg-blue-500 text-white px-4 mt-4 py-2 rounded-md w-fit  ${
-                  uploadedImageUrls.length !== imageInputs.length
-                    ? "opacity-50 cursor-not-allowed"
-                    : "hover:bg-blue-600"
-                }
-                `}
-              >
-                新增更多圖片
-              </button>
-            )}
           </div>
         ))}
         {/* show uploaded images */}
@@ -398,23 +381,16 @@ export default function Home() {
           <button
             type="submit"
             disabled={
-              loading || uploadedImageUrls.length !== imageInputs.length
+              loading
             } // 判斷條件
             className={`bg-green-500 text-gray-100 px-4 py-2 rounded-md ${
-              loading ||
-              uploadedImageUrls.length !== imageInputs.length ||
-              !uploadedImageUrls.length ||
-              !imageInputs.length
+              loading 
                 ? "opacity-50 cursor-not-allowed"
                 : "hover:bg-green-600"
             }`}
           >
             {loading
               ? "上傳中..."
-              : uploadedImageUrls.length !== imageInputs.length ||
-                  !uploadedImageUrls.length ||
-                  !imageInputs.length
-                ? "請先上傳圖片"
                 : "上傳產品"}
           </button>
         </div>
