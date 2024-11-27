@@ -52,7 +52,7 @@ export default function Home() {
       return;
     }
     try {
-      setIsPressed(true);
+      setLoading(true);
       // 壓縮圖片
       const pressedFile = await imageCompression(file, {
         // 壓縮參數
@@ -70,7 +70,7 @@ export default function Home() {
         return updatedUrls;
       });
 
-      setIsPressed(false);
+      setLoading(false);
     } catch (err) {
       console.error("Error uploading file:", err);
     }
