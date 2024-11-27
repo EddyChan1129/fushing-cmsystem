@@ -38,12 +38,22 @@ export default function Home() {
     }
   }, [isRemoveImage]); // 當 imageInputs 更新時觸發
 
-  const handleImage = (e, index) => {
-    const files = Array.from(e.target.files); // 獲取所有選中的文件
-    files.forEach((file, fileIndex) => {
-      handleUpload(file, index + fileIndex); // 傳遞文件和正確的索引
-    });
+  const handleImage = async (e, index) => {
+    const files = Array.from(e.target.files); // 获取所有选中的文件
+    setLoading(true);
+  
+    // 使用map构建所有上传任务的Promise数组
+    const uploadPromises = files.map((file, fileIndex) =>
+      handleUpload(file, index + fileIndex) // 调用上传函数并传递索引
+    );
+  
+    // 等待所有上传任务完成
+    await Promise.all(uploadPromises);
+  
+    // 所有上传完成后再设置loading为false
+    setLoading(false);
   };
+  
 
   const handleUpload = async (file, index) => {
     if (!file) {
@@ -51,7 +61,6 @@ export default function Home() {
       return;
     }
     try {
-      setLoading(true);
       // 壓縮圖片
       const pressedFile = await imageCompression(file, {
         // 壓縮參數
@@ -66,8 +75,6 @@ export default function Home() {
         updatedUrls[index] = response.location; // 更新對應 index 的 URL
         return updatedUrls;
       });
-
-      setLoading(false);
     } catch (err) {
       console.error("Error uploading file:", err);
     }
@@ -339,7 +346,7 @@ export default function Home() {
               loading ? "opacity-50 cursor-not-allowed" : "hover:bg-green-600"
             }`}
           >
-            {loading ? "上傳中..." : "上傳產品"}
+            {loading ? "處理圖片中..." : "上傳產品"}
           </button>
         </div>
       </form>
