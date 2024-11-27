@@ -154,6 +154,13 @@ export default function Home() {
   };
 
   const handleChange = (e) => {
+    // if e.target.name is price or width or height, confirm the string is contain number or "." only
+    if (
+      ["price", "width", "height"].includes(e.target.name) &&
+      !/^\d*\.?\d*$/.test(e.target.value)
+    ) {
+      return;
+    }
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
