@@ -39,12 +39,11 @@ export default function Home() {
   }, [isRemoveImage]); // 當 imageInputs 更新時觸發
 
   const handleImage = (e, index) => {
-  const files = Array.from(e.target.files); // 獲取所有選中的文件
-  files.forEach((file, fileIndex) => {
-    handleUpload(file, index + fileIndex); // 傳遞文件和正確的索引
-  });
-};
-
+    const files = Array.from(e.target.files); // 獲取所有選中的文件
+    files.forEach((file, fileIndex) => {
+      handleUpload(file, index + fileIndex); // 傳遞文件和正確的索引
+    });
+  };
 
   const handleUpload = async (file, index) => {
     if (!file) {
@@ -59,8 +58,6 @@ export default function Home() {
         maxSizeMB: 0.1,
         useWebWorker: true,
       });
-
-      
 
       const response = await ReactS3Client.uploadFile(pressedFile);
       console.log("Uploaded Image Data:", response);
@@ -292,13 +289,14 @@ export default function Home() {
                       key={index}
                       className="flex items-center justify-between"
                     >
-                      {type}{""}
+                      {type}
+                      {""}
                       <span
                         style={{ color: "white" }}
                         className="bg-blue-500 px-1.5 py-0 text-sm rounded-full shadow-md cursor-pointer"
                         onClick={() => handleRemoveType(index)}
                       >
-                        x 
+                        x
                       </span>
                     </div>
                   ))}
@@ -340,7 +338,7 @@ export default function Home() {
             </label>
             <input
               type="file"
-              multiple 
+              multiple
               id={`gg${index}`}
               onChange={(e) => handleImage(e, index)}
               className={`hidden ${
@@ -380,18 +378,12 @@ export default function Home() {
           {/* Submit button */}
           <button
             type="submit"
-            disabled={
-              loading
-            } // 判斷條件
+            disabled={loading} // 判斷條件
             className={`bg-green-500 text-gray-100 px-4 py-2 rounded-md ${
-              loading 
-                ? "opacity-50 cursor-not-allowed"
-                : "hover:bg-green-600"
+              loading ? "opacity-50 cursor-not-allowed" : "hover:bg-green-600"
             }`}
           >
-            {loading
-              ? "上傳中..."
-                : "上傳產品"}
+            {loading ? "上傳中..." : "上傳產品"}
           </button>
         </div>
       </form>
