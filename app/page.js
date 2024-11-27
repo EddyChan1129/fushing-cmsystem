@@ -115,9 +115,6 @@ export default function Home() {
     // 將需要的字段轉換為整數
     const formattedForm = {
       ...form,
-      price: parseInt(form.price, 10) || null, // 如果為空，默認為 null
-      width: parseInt(form.width, 10) || null,
-      height: parseInt(form.height, 10) || null,
     };
 
     const supabase = getSupabase();
@@ -194,7 +191,6 @@ export default function Home() {
             價錢 (HKD)
           </label>
           <input
-            type="number"
             name="price"
             value={form.price}
             onChange={handleChange}
@@ -207,7 +203,6 @@ export default function Home() {
             寬度 (CM)
           </label>
           <input
-            type="number"
             name="width"
             value={form.width}
             onChange={handleChange}
@@ -220,7 +215,6 @@ export default function Home() {
             高度 (CM)
           </label>
           <input
-            type="number"
             name="height"
             value={form.height}
             onChange={handleChange}
@@ -230,22 +224,33 @@ export default function Home() {
         </div>
 
         <div className="mb-4">
-          <div className="flex gap-1 items-center flex-wrap ">
+          <div className="flex gap-1 flex-wrap ">
             <p className="text-gray-700">請選擇種類：</p>
-            <div className="flex items-center gap-2  w-full flex-wrap">
-              {["其他", "聖誕樹", "掛件", "窗貼", "燈飾", "大型擺設"].map(
-                (type) => (
-                  <label key={type} className=" text-gray-500 flex gap-1">
-                    <input
-                      type="radio"
-                      value={type}
-                      name="product_type"
-                      onChange={handleChange}
-                    />
-                    {type}
-                  </label>
-                ),
-              )}
+            <div className="flex gap-2  w-full flex-wrap">
+              {["其他"].map((type) => (
+                <label key={type} className=" text-gray-500 flex gap-2 w-full">
+                  <input
+                    type="radio"
+                    value={type}
+                    name="product_type"
+                    onChange={handleChange}
+                    checked={form.product_type === type}
+                  />
+                  {type}
+                </label>
+              ))}
+
+              {["聖誕樹", "掛件", "窗貼", "燈飾", "大型擺設"].map((type) => (
+                <label key={type} className=" text-gray-500 flex gap-2">
+                  <input
+                    type="radio"
+                    value={type}
+                    name="product_type"
+                    onChange={handleChange}
+                  />
+                  {type}
+                </label>
+              ))}
             </div>
           </div>
         </div>
