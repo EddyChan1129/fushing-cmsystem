@@ -39,9 +39,12 @@ export default function Home() {
   }, [isRemoveImage]); // 當 imageInputs 更新時觸發
 
   const handleImage = (e, index) => {
-    const file = e.target.files[0];
-    handleUpload(file, index); // 傳遞 file 和 index
-  };
+  const files = Array.from(e.target.files); // 獲取所有選中的文件
+  files.forEach((file, fileIndex) => {
+    handleUpload(file, index + fileIndex); // 傳遞文件和正確的索引
+  });
+};
+
 
   const handleUpload = async (file, index) => {
     if (!file) {
@@ -162,7 +165,7 @@ export default function Home() {
   };
 
   const addImageInput = (index) => {
-    setImageInputs((prev) => [...prev, prev.length]); // 新增一個 input 的 index
+    setImageInputs((prev) => [...prev, ...new Array(1).fill(prev.length)]); // 新增一個新的 input
     // trigger select file id:file{index}
     setIsRemoveImage(!isRemoveImage);
   };
@@ -339,6 +342,7 @@ export default function Home() {
             </label>
             <input
               type="file"
+              multiple 
               id={`gg${index}`}
               onChange={(e) => handleImage(e, index)}
               className={`hidden ${
