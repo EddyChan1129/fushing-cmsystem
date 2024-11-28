@@ -15,9 +15,7 @@ export default function Home() {
   const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
   const [imageInputs, setImageInputs] = useState([0]); // 用來動態新增file input的狀態
   const [loading, setLoading] = useState(false);
-  const [isRemoveImage, setIsRemoveImage] = useState(false);
-  const [isPressed, setIsPressed] = useState(false);
-  const [unit, setUnit] = useState("cm");
+  const [unit, setUnit] = useState("米");
 
   const [form, setForm] = useState({
     name: "",
@@ -27,17 +25,6 @@ export default function Home() {
     desc: "",
     product_type: "其他",
   });
-
-  useEffect(() => {
-    if (imageInputs.length > 0) {
-      // 獲取最新的 input id
-      const newIndex = imageInputs.length - 1;
-      const newInput = document.getElementById(`gg${newIndex}`);
-      if (newInput) {
-        newInput.click(); // 點擊最新添加的 input
-      }
-    }
-  }, [isRemoveImage]); // 當 imageInputs 更新時觸發
 
   const handleImage = async (e, index) => {
     const files = Array.from(e.target.files); // 获取所有选中的文件
@@ -122,8 +109,8 @@ export default function Home() {
     // form width and height add unit
     const formattedForm = {
       ...form,
-      width: form.width ? `${form.width} ${unit}` : "",
-      height: form.height ? `${form.height} ${unit}` : "",
+      width: form.width ? `${form.width}(${unit})` : "",
+      height: form.height ? `${form.height}(${unit})` : "",
     };
 
     const supabase = getSupabase();
@@ -222,32 +209,32 @@ export default function Home() {
               <div className="flex gap-1">
                 <input
                   type="radio"
-                  value="cm"
+                  value="米"
                   name="unit"
                   onChange={(e) => setUnit(e.target.value)}
-                  checked={unit === "cm"}
+                  checked={unit === "米"}
                 />
-                cm
+                米
               </div>
               <div className="flex gap-1">
                 <input
                   type="radio"
-                  value="m"
+                  value="厘米"
                   name="unit"
                   onChange={(e) => setUnit(e.target.value)}
-                  checked={unit === "m"}
+                  checked={unit === "厘米"}
                 />
-                m
+                厘米
               </div>
               <div className="flex gap-1">
                 <input
                   type="radio"
-                  value="mm"
+                  value="毫米"
                   name="unit"
                   onChange={(e) => setUnit(e.target.value)}
-                  checked={unit === "mm"}
+                  checked={unit === "毫米"}
                 />
-                mm
+                毫米
               </div>
             </div>
           </label>
@@ -261,8 +248,40 @@ export default function Home() {
           />
         </div>
         <div className="mb-4">
-          <label className="block text-gray-600 font-medium mb-2">
+          <label className=" text-gray-600 font-medium mb-2 flex justify-between">
             高度 ({unit})
+            <div className="flex gap-3">
+              <div className="flex gap-1">
+                <input
+                  type="radio"
+                  value="米"
+                  name="unit2"
+                  onChange={(e) => setUnit(e.target.value)}
+                  checked={unit === "米"}
+                />
+                米
+              </div>
+              <div className="flex gap-1">
+                <input
+                  type="radio"
+                  value="厘米"
+                  name="unit2"
+                  onChange={(e) => setUnit(e.target.value)}
+                  checked={unit === "厘米"}
+                />
+                厘米
+              </div>
+              <div className="flex gap-1">
+                <input
+                  type="radio"
+                  value="毫米"
+                  name="unit2"
+                  onChange={(e) => setUnit(e.target.value)}
+                  checked={unit === "毫米"}
+                />
+                毫米
+              </div>
+            </div>
           </label>
           <input
             name="height"
@@ -324,27 +343,19 @@ export default function Home() {
             className={`mb-4 flex items-center justify-between ${index === imageInputs.length - 1 ? "" : "hidden"}`}
           >
             <label
-              htmlFor={isPressed ? undefined : `gg${index}`}
+              htmlFor={`gg${index}`}
               className={`bg-blue-500 text-white px-4 py-2 rounded-md w-fit  hover:bg-blue-100 ${
                 uploadedImageUrls[index] ? "hidden" : ""
-              }  ${
-                isPressed
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-green-600"
-              }`}
+              }  `}
             >
-              {isPressed ? <>壓縮圖片中...請不要離開視窗</> : "上傳圖片"}
+              上傳圖片
             </label>
             <input
               type="file"
               multiple
               id={`gg${index}`}
               onChange={(e) => handleImage(e, index)}
-              className={`hidden ${
-                isPressed
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-green-600"
-              }`} // 隱藏原始 input
+              className={`hidden`} // 隱藏原始 input
             />
           </div>
         ))}
