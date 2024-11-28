@@ -17,6 +17,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [isRemoveImage, setIsRemoveImage] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
+  const [unit, setUnit] = useState("cm");
 
   const [form, setForm] = useState({
     name: "",
@@ -41,19 +42,18 @@ export default function Home() {
   const handleImage = async (e, index) => {
     const files = Array.from(e.target.files); // 获取所有选中的文件
     setLoading(true);
-  
+
     // 使用map构建所有上传任务的Promise数组
-    const uploadPromises = files.map((file, fileIndex) =>
-      handleUpload(file, index + fileIndex) // 调用上传函数并传递索引
+    const uploadPromises = files.map(
+      (file, fileIndex) => handleUpload(file, index + fileIndex), // 调用上传函数并传递索引
     );
-  
+
     // 等待所有上传任务完成
     await Promise.all(uploadPromises);
-  
+
     // 所有上传完成后再设置loading为false
     setLoading(false);
   };
-  
 
   const handleUpload = async (file, index) => {
     if (!file) {
@@ -119,9 +119,11 @@ export default function Home() {
         console.error("Please upload at least one image before submitting");
         return;
       } */
-    // 將需要的字段轉換為整數
+    // form width and height add unit
     const formattedForm = {
       ...form,
+      width: form.width ? `${form.width} ${unit}` : "",
+      height: form.height ? `${form.height} ${unit}` : "",
     };
 
     const supabase = getSupabase();
@@ -161,13 +163,14 @@ export default function Home() {
   };
 
   const handleChange = (e) => {
-    // if e.target.name is price or width or height, confirm the string is contain number or "." only
+    // if e.target.name is price or width or height, confirm the string is contain number or "." only else add unit to the string
     if (
       ["price", "width", "height"].includes(e.target.name) &&
       !/^\d*\.?\d*$/.test(e.target.value)
     ) {
       return;
     }
+
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -213,9 +216,42 @@ export default function Home() {
           />
         </div>
         <div className="mb-4">
-          <label className="block text-gray-600 font-medium mb-2">
-            寬度 (CM)
+          <label className="text-gray-600 font-medium mb-2  flex justify-between">
+            寬度 ({unit})
+            <div className="flex gap-3">
+              <div className="flex gap-1">
+                <input
+                  type="radio"
+                  value="cm"
+                  name="unit"
+                  onChange={(e) => setUnit(e.target.value)}
+                  checked={unit === "cm"}
+                />
+                cm
+              </div>
+              <div className="flex gap-1">
+                <input
+                  type="radio"
+                  value="m"
+                  name="unit"
+                  onChange={(e) => setUnit(e.target.value)}
+                  checked={unit === "m"}
+                />
+                m
+              </div>
+              <div className="flex gap-1">
+                <input
+                  type="radio"
+                  value="mm"
+                  name="unit"
+                  onChange={(e) => setUnit(e.target.value)}
+                  checked={unit === "mm"}
+                />
+                mm
+              </div>
+            </div>
           </label>
+
           <input
             name="width"
             value={form.width}
@@ -226,7 +262,7 @@ export default function Home() {
         </div>
         <div className="mb-4">
           <label className="block text-gray-600 font-medium mb-2">
-            高度 (CM)
+            高度 ({unit})
           </label>
           <input
             name="height"
