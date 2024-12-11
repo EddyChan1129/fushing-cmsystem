@@ -309,7 +309,17 @@ export default function Home() {
                 </label>
               ))}
 
-              {["聖誕樹", "掛件", "窗貼", "燈飾", "大型擺設"].map((type) => (
+              {[
+                "聖誕樹",
+                "聖誕樹吊飾",
+                "聖誕服飾",
+                "場景佈置",
+                "掛飾",
+                "窗貼",
+                "燈飾",
+                "小型擺設",
+                "大型擺設",
+              ].map((type) => (
                 <label key={type} className=" text-gray-500 flex gap-2">
                   <input
                     type="radio"

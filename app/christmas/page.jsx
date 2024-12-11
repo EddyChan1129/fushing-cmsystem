@@ -1,6 +1,6 @@
 "use client";
-import { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { useState, useEffect } from "react";
+import { createClient } from "@supabase/supabase-js";
 
 // 初始化 Supabase 客戶端
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -10,7 +10,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [editIndex, setEditIndex] = useState(null);
-  const [formData, setFormData] = useState({  price: '' });
+  const [formData, setFormData] = useState({ price: "" });
 
   // 載入數據
   useEffect(() => {
@@ -20,13 +20,13 @@ export default function Home() {
   const fetchProducts = async () => {
     try {
       const { data, error } = await supabase
-        .from('fushing') // 確保表名正確
-        .select('id, price');
+        .from("fushing") // 確保表名正確
+        .select("id, price");
 
       if (error) throw error;
       setProducts(data);
     } catch (error) {
-      console.error('Error fetching data:', error.message);
+      console.error("Error fetching data:", error.message);
     }
   };
 
@@ -40,9 +40,9 @@ export default function Home() {
   const handleSave = async (id) => {
     try {
       const { error } = await supabase
-        .from('fushing')
+        .from("fushing")
         .update({ price: formData.price })
-        .eq('id', id);
+        .eq("id", id);
 
       if (error) throw error;
 
@@ -50,7 +50,7 @@ export default function Home() {
       fetchProducts();
       setEditIndex(null);
     } catch (error) {
-      console.error('Error updating product:', error.message);
+      console.error("Error updating product:", error.message);
     }
   };
 
@@ -63,10 +63,9 @@ export default function Home() {
     <div>
       <h1>Product List</h1>
       {products.map((product, index) => (
-        <div key={product.id} style={{ marginBottom: '1rem' }}>
+        <div key={product.id} style={{ marginBottom: "1rem" }}>
           {editIndex === index ? (
             <>
-
               <input
                 type="number"
                 name="price"

@@ -2,13 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Chocolate+Classical+Sans&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Chocolate+Classical+Sans&display=swap");
 
-h1,h2,h3,h4,span,p,div,li,ul,ol,button,input,textarea,select,option,table,th,td,form {
+h1,
+h2,
+h3,
+h4,
+span,
+p,
+div,
+li,
+ul,
+ol,
+button,
+input,
+textarea,
+select,
+option,
+table,
+th,
+td,
+form {
   font-family: "Chocolate Classical Sans", sans-serif;
   font-weight: 500;
   font-style: normal;
 }
-
-
-
