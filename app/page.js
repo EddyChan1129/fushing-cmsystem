@@ -24,6 +24,7 @@ export default function Home() {
     height: "",
     desc: "",
     product_type: "其他",
+    stock_status: "有現貨", // 新增字段，默認為 "有現貨"
   });
 
   const handleImage = async (e, index) => {
@@ -102,11 +103,7 @@ export default function Home() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    /*   if (!uploadedImageUrls.length) {
-        console.error("Please upload at least one image before submitting");
-        return;
-      } */
-    // form width and height add unit
+
     const formattedForm = {
       ...form,
       width: form.width ? `${form.width}(${unit})` : "",
@@ -128,15 +125,14 @@ export default function Home() {
         price: "",
         width: "",
         height: "",
-        product_type: "其他",
         desc: "",
-      }); // Reset form
-      setUploadedImageUrls([]); // Reset images
-      setImageInputs([0]); // Reset input rows
+        product_type: "其他",
+        stock_status: "有現貨", // 重置表單時的默認值
+      });
+      setUploadedImageUrls([]);
+      setImageInputs([0]);
       setLoading(false);
-      // input file reset to empty
       document.querySelector("input[type=file]").value = "";
-
       toast.success("產品上傳成功", {
         position: "top-center",
         duration: 5000,
@@ -150,7 +146,7 @@ export default function Home() {
   };
 
   const handleChange = (e) => {
-    // if e.target.name is price or width or height, confirm the string is contain number or "." only else add unit to the string
+    // 檢查是否為數值字段，限制輸入格式
     if (
       ["price", "width", "height"].includes(e.target.name) &&
       !/^\d*\.?\d*$/.test(e.target.value)
@@ -159,10 +155,6 @@ export default function Home() {
     }
 
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const addImageInput = (index) => {
-    setImageInputs((prev) => [...prev, ...new Array(1).fill(prev.length)]); // 新增一個新的 input
   };
 
   return (
@@ -190,6 +182,34 @@ export default function Home() {
             placeholder="輸入產品名稱"
           />
         </div>
+        <div className="mb-4">
+          <label className="block text-gray-600 font-medium mb-2">
+            庫存狀態
+          </label>
+          <div className="flex gap-4">
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="stock_status"
+                value="有現貨"
+                checked={form.stock_status === "有現貨"}
+                onChange={handleChange}
+              />
+              有現貨
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="stock_status"
+                value="需預訂"
+                checked={form.stock_status === "需預訂"}
+                onChange={handleChange}
+              />
+              需預訂
+            </label>
+          </div>
+        </div>
+
         <div className="mb-4">
           <label className="block text-gray-600 font-medium mb-2">
             價錢 (HKD)
